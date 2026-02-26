@@ -11,33 +11,92 @@
     width: 100%;
     height: 100%;
     background: black;
-    overflow: hidden;
+    overflow-y: scroll;
+    font-family: sans-serif;
+  }
+  .section {
+    height: 100vh;
+    position: relative;
   }
   video {
     width: 100vw;
     height: 100vh;
     object-fit: cover;
   }
-  .follow-btn {
+  .ig-btn {
     position: fixed;
-    bottom: 30px;
+    bottom: 90px;
     left: 50%;
     transform: translateX(-50%);
-    background: rgba(255,255,255,0.15);
+    background: rgba(0,0,0,0.4);
     color: white;
-    font-family: sans-serif;
-    font-size: 18px;
-    padding: 14px 28px;
+    padding: 12px 22px;
     border-radius: 999px;
-    backdrop-filter: blur(10px);
-    -webkit-backdrop-filter: blur(10px);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
     user-select: none;
+  }
+  .ig-icon {
+    width: 20px;
+    height: 20px;
+    background: radial-gradient(circle at 30% 30%, #feda75, #fa7e1e, #d62976, #962fbf, #4f5bd5);
+    border-radius: 6px;
+    position: relative;
+  }
+  .ig-icon::after {
+    content: "";
+    position: absolute;
+    inset: 4px;
+    border: 2px solid white;
+    border-radius: 4px;
+  }
+  .ig-icon::before {
+    content: "";
+    position: absolute;
+    width: 3px;
+    height: 3px;
+    background: white;
+    border-radius: 50%;
+    top: 3px;
+    right: 3px;
+  }
+  .handle {
+    font-size: 15px;
+    letter-spacing: 0.3px;
+  }
+  .ej {
+    position: fixed;
+    bottom: 20px;
+    width: 100%;
+    text-align: center;
+    font-size: 42px;
+    font-weight: 700;
+    color: white;
+    opacity: 0.8;
+    animation: float 3s ease-in-out infinite;
+  }
+  @keyframes float {
+    0% { transform: translateY(0); opacity: 0.7; }
+    50% { transform: translateY(-8px); opacity: 1; }
+    100% { transform: translateY(0); opacity: 0.7; }
   }
 </style>
 </head>
 <body>
-<video id="camera" autoplay playsinline></video>
-<div class="follow-btn" id="flipBtn">FOLLOW</div>
+
+<div class="section">
+  <video id="camera" autoplay playsinline></video>
+</div>
+
+<div class="ig-btn" id="flipBtn">
+  <div class="ig-icon"></div>
+  <div class="handle">@justtt_ej</div>
+</div>
+
+<div class="ej">EJ</div>
 
 <script>
 const video = document.getElementById('camera');
