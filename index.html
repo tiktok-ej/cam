@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Camera Review</title>
+<style>
+  html, body {
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    height: 100%;
+    background: black;
+    overflow: hidden;
+    touch-action: manipulation;
+  }
+  video {
+    width: 100vw;
+    height: 100vh;
+    object-fit: cover;
+  }
+</style>
+</head>
+<body>
+<video id="camera" autoplay playsinline></video>
+
+<script>
+const video = document.getElementById('camera');
+let currentFacing = "environment"; // back camera
+let currentLens = "default"; // default or ultrawide
+let lastTap = 0;
+let tapCount = 0;
+let stream = null;
+
+async function startCamera() {
+  if (stream) {
+    stream.getTracks().forEach(t => t.stop());
+  }
+
+  const constraints = {
+    video: {
+      facingMode: currentFacing,
+      width: { ideal: 1920 },
+      height: { ideal: 1080 }
+    },
+    audio: false
+  };
+
+  try {
+    stream = await navigator.mediaDevices.getUserMedia(constraints);
+    video.srcObject = stream;
+  } catch (e) {
+    console.error(e);
+  }
+}
+
+function toggleFrontBack() {
+  currentFacing = currentFacing === "user" ? "environment" : "user";
+  currentLens = "default";
+  startCamera();
+}
+
+async function switchToUltraWide() {
+  if (currentFacing !== "environment") return;
+
+  try {
+    const devices = await navigator.mediaDevices.enumerateDevices();
+    const videoInputs = devices.filter(d => d.kind === "videoinput");
+
+    // crude ultrawide guess: last rear camera
+    const rearCams = videoInputs.filter(d =>
+      d.label.toLowerCase().includes("back") ||
+      d.label.toLowerCase().includes("rear")
+    );
+
+    if (rearCams.length > 1) {
+      const ultra = rearCams[rearCams.length - 1];
+      if (stream) stream.getTracks().forEach(t => t.stop());
+
+      stream = await navigator.mediaDevices.getUserMedia({
+        video: { deviceId: { exact: ultra.deviceId } },
+        audio: false
+      });
+      video.srcObject = stream;
+      currentLens = "ultrawide";
+    }
+  } catch (e) {
+    console.error(e);
+  }
+}
+
+function handleTap() {
+  const now = Date.now();
+  if (now - lastTap < 300) {
+    tapCount++;
+  } else {
+    tapCount = 1;
+  }
+  lastTap = now;
+
+  if (tapCount === 2) {
+    toggleFrontBack();
+  }
+  if (tapCount === 3) {
+    switchToUltraWide();
+    tapCount = 0;
+  }
+}
+
+document.body.addEventListener("click", handleTap);
+document.body.addEventListener("touchend", handleTap);
+
+startCamera();
+</script>
+</body>
+</html>
